@@ -1,13 +1,14 @@
 import torch
-import gdown
+# import gdown
 import random
-
+import requests
 import numpy as np
 import pandas as pd
 import streamlit as st
 import matplotlib.colors as mcolors
 
 from tqdm import tqdm
+from urllib.parse import urlencode
 from annotated_text import annotated_text
 from torch.utils.data import Dataset, DataLoader
 from models.collate import collate_fn, gold_labels
@@ -25,11 +26,24 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
 
-@st.cache
+@st.cache_resource
 def load_model():
-    url = 'https://drive.google.com/uc?id=14qaP5Zh-ox0WYLRL3fBo3hjN7E8LRNwR'
-    output = 'model.pt'
-    gdown.download(url, output, quiet=False)
+    # url = 'https://drive.google.com/uc?id=14qaP5Zh-ox0WYLRL3fBo3hjN7E8LRNwR'
+    # output = 'model.pt'
+    # gdown.download(url, output, quiet=False)
+
+    base_url = 'https://cloud-api.yandex.net/v1/disk/public/resources/download?'
+    public_key = 'https://disk.yandex.ru/d/VNRKw04VDWjwzg'  # Сюда вписываете вашу ссылку
+
+    # Получаем загрузочную ссылку
+    final_url = base_url + urlencode(dict(public_key=public_key))
+    response = requests.get(final_url)
+    download_url = response.json()['href']
+
+    # Загружаем файл и сохраняем его
+    download_response = requests.get(download_url)
+    with open('model.pt', 'wb') as f:  # Здесь укажите нужный путь к файлу
+        f.write(download_response.content)
 load_model()
 
 class CustomDatasetSample(Dataset):
