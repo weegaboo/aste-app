@@ -26,7 +26,7 @@ if torch.cuda.is_available():
     torch.cuda.empty_cache()
 
 
-@st.cache_resource
+@st.cache
 def load_model():
     # url = 'https://drive.google.com/uc?id=14qaP5Zh-ox0WYLRL3fBo3hjN7E8LRNwR'
     # output = 'model.pt'
